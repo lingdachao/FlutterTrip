@@ -24,9 +24,9 @@ class _TabNavigatorState extends State<TabNavigator> {
         controller: _controller,
         children: <Widget>[
           HomePage(),
-          MePage(),
           SearchPage(),
-          TravelPage()
+          TravelPage(),
+          MePage(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
