@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 
 enum SearchBarType { home, normal, homeLight }
 
@@ -80,7 +81,39 @@ class _SearchBarState extends State<SearchBar>{
   }
 
   _genHomeSearch(){
+    return Container(
+        child: Row(
+          children: <Widget>[
+            _wrapTap(
+                Container(
+                  padding: EdgeInsets.fromLTRB(6, 5, 5, 5),
+                  child: Row(
+                    children: <Widget>[
+                      Text('上海',style: TextStyle(color: _homeFontColor(), fontSize: 14)),
+                      Icon(Icons.expand_more, color: _homeFontColor(), size: 22,)
+                    ],
+                  ),
+                ), widget.leftButtonClick),
+            Expanded(
+              flex: 1,
+              child: _inputBox(),
+            ),
+            _wrapTap(
+                Container(
+                  padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
+                  child: Icon(
+                    Icons.comment,
+                    color: _homeFontColor(),
+                    size: 26,
+                  ),
+                ), widget.rightButtonClick)
+          ],
+        )
+    );
+  }
 
+  _homeFontColor(){
+    return widget.searchBarType == SearchBarType.homeLight ? Colors.black54 : Colors.white;
   }
 
   _inputBox(){
@@ -112,7 +145,7 @@ class _SearchBarState extends State<SearchBar>{
                   TextField(
                     controller: _controller,
                     onChanged: _onChanged,
-                    autofocus: true,
+                    autofocus: false,
                     style: TextStyle( //文字样式
                       fontSize: 18,
                       color: Colors.black,

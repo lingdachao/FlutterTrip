@@ -5,16 +5,19 @@ import 'package:myfluttertrip/Model/common_model.dart';
 import 'package:myfluttertrip/Model/grid_nav_model.dart';
 import 'package:myfluttertrip/Model/home_model.dart';
 import 'package:myfluttertrip/Model/sales_box_model.dart';
+import 'package:myfluttertrip/pages/seach_page.dart';
 import 'package:myfluttertrip/util/navigator_util.dart';
 import 'package:myfluttertrip/widget/grid_nav.dart';
 import 'package:myfluttertrip/widget/loadding_container.dart';
 import 'package:myfluttertrip/widget/local_nav.dart';
 import 'package:myfluttertrip/widget/sales_box.dart';
+import 'package:myfluttertrip/widget/search_bar.dart';
 import 'package:myfluttertrip/widget/sub_nav.dart';
 import 'package:myfluttertrip/widget/webview.dart';
 import 'package:myfluttertrip/util/navigator_util.dart';
 
 const APPBAR_SCROLL_OFFSET = 100;
+const SEARCH_BAR_DEFALUT_TEXT = '网红打卡地 景点 酒店 美食';
 
 class HomePage extends StatefulWidget {
   @override
@@ -41,6 +44,7 @@ class _HomePageState extends State<HomePage> {
   loadData() async {
     try{
       HomeModel model = await HomeDao.fetch();
+      print(model.config.searchUrl);
       setState(() {
           _Loading = false;
           bannerList = model.bannerList;
@@ -97,31 +101,7 @@ class _HomePageState extends State<HomePage> {
   Widget get _listView {
     return ListView(
       children: <Widget>[
-        Container(
-          height: 240,
-          child: Swiper(
-              itemCount: bannerList.length,
-              autoplay: true,
-              itemBuilder: (BuildContext context, int index){
-                CommonModel model = bannerList[index];
-                return GestureDetector(
-                  onTap: () {
-                    NavigatorUtil.push(
-                        context,
-                        WebView(
-                          url: model.url,
-                          statusBarColor: model.statusBarColor,
-                          hideAppBar: model.hideAppBar,
-                        ));
-                  },
-                  child: Image.network(
-                      model.icon,
-                      fit: BoxFit.fill),
-                );
-              },
-              pagination: SwiperPagination()
-          ),
-        ),
+        _banner,
         Padding(
           padding: EdgeInsets.fromLTRB(7, 4, 7, 4),
           child: LocalNav(localNavList: localNavList),
@@ -142,16 +122,81 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget get _appBar {
-    return Opacity(
-      opacity: appBarAlpha,
-      child: Container(
-        height: 80,
-        decoration: BoxDecoration(color: Colors.white),
-        child: Center(
-          child: Padding(padding: EdgeInsets.only(top: 20),child: Text('首页'),),
-        ),
+  Widget get _banner {
+    return         Container(
+      height: 240,
+      child: Swiper(
+          itemCount: bannerList.length,
+          autoplay: true,
+          itemBuilder: (BuildContext context, int index){
+            CommonModel model = bannerList[index];
+            return GestureDetector(
+              onTap: () {
+                NavigatorUtil.push(
+                    context,
+                    WebView(
+                      url: model.url,
+                      statusBarColor: model.statusBarColor,
+                      hideAppBar: model.hideAppBar,
+                    ));
+              },
+              child: Image.network(
+                  model.icon,
+                  fit: BoxFit.fill),
+            );
+          },
+          pagination: SwiperPagination()
       ),
     );
+  }
+
+  Widget get _appBar {
+    return Column(
+      children: <Widget>[
+        Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0x66000000), Colors.transparent],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter
+            )
+          ),
+          child: Container(
+            padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
+            height: 80.0,
+            decoration: BoxDecoration(
+              color: Color.fromRGBO(255, 255, 255, appBarAlpha)
+            ),
+            child: SearchBar(
+              searchBarType: appBarAlpha > 0.2 ? SearchBarType.homeLight : SearchBarType.home,
+              inputBoxClick: _jumpToSearch,
+              speakClick: _jumpToSpeak,
+              defaultText: SEARCH_BAR_DEFALUT_TEXT,
+              leftButtonClick: (){},
+            ),
+          ),
+        ),
+        Container(
+          height: appBarAlpha > 0.2 ? 0.5 : 0 ,
+          decoration: BoxDecoration(
+            boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 0.5)]
+          ),
+        )
+      ],
+    );
+  }
+
+
+
+  _jumpToSearch(){
+    NavigatorUtil.push(context,
+    SearchPage(
+      hint: SEARCH_BAR_DEFALUT_TEXT,
+      hideLeft: false,
+    ));
+  }
+
+  _jumpToSpeak(){
+
   }
 }
